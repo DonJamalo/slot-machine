@@ -1,0 +1,466 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jamal's Christmas Slot 🎄</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: linear-gradient(180deg, #06142e, #102c52);
+    color: white;
+    font-family: Georgia, serif;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 35px;
+    color: #f5d77b;
+    font-size: clamp(28px, 6vw, 45px);
+    text-shadow: 0 0 15px #d5a63d;
+}
+
+.subtitle {
+    color: #dceaff;
+    font-size: 17px;
+    margin-bottom: 30px;
+}
+
+/* Schnee */
+#snow {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Spielautomat */
+.machine {
+    position: relative;
+    width: min(90%, 550px);
+    margin: 20px auto;
+    padding: 25px 20px 30px;
+    background: linear-gradient(145deg, #b71c2c, #670b19);
+    border: 7px solid #e4bb54;
+    border-radius: 30px;
+    box-shadow:
+        0 0 25px rgba(255, 196, 67, 0.4),
+        inset 0 0 15px #ffb6a0;
+}
+
+.machine-title {
+    color: #ffe7a0;
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px #5b0000;
+}
+
+/* Walzen */
+.reels {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    background: #e9e9e9;
+    border: 5px solid #e1b84f;
+    border-radius: 15px;
+    box-shadow: inset 0 0 15px #777;
+}
+
+.reel {
+    width: 30%;
+    height: 110px;
+    background: white;
+    border: 3px solid #b9a36b;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(40px, 10vw, 65px);
+    overflow: hidden;
+    box-shadow: inset 0 0 10px #aaa;
+}
+
+.reel.spinning {
+    animation: shake 0.12s infinite;
+    filter: blur(1px);
+}
+
+@keyframes shake {
+    0% { transform: translateY(-4px); }
+    50% { transform: translateY(4px); }
+    100% { transform: translateY(-4px); }
+}
+
+/* Button */
+#spinButton {
+    margin-top: 25px;
+    padding: 17px 35px;
+    border: 3px solid #ffe7a0;
+    border-radius: 50px;
+    background: linear-gradient(#f6d36b, #c18b23);
+    color: #64101a;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #805514;
+    transition: 0.2s;
+}
+
+#spinButton:hover {
+    transform: scale(1.06);
+}
+
+#spinButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#status {
+    min-height: 30px;
+    margin-top: 20px;
+    font-size: 18px;
+    color: #ffe7a0;
+}
+
+/* Weihnachtsgruß */
+#christmasMessage {
+    display: none;
+    margin: 30px auto;
+    width: min(90%, 500px);
+    padding: 30px 15px;
+    background: linear-gradient(135deg, #fff3cf, #e9b85c);
+    color: #791323;
+    border: 5px solid white;
+    border-radius: 20px;
+    box-shadow: 0 0 35px #ffd86b;
+    animation: appear 1s ease;
+}
+
+#christmasMessage h2 {
+    font-size: clamp(25px, 6vw, 38px);
+    margin: 10px 0;
+}
+
+#christmasMessage p {
+    font-size: 23px;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.reindeer {
+    font-size: 75px;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Musikbutton */
+#musicButton {
+    margin: 25px auto 40px;
+    background: transparent;
+    color: white;
+    border: 1px solid #e5c66f;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+footer {
+    padding: 15px;
+    color: #9bb5d5;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="snow"></canvas>
+
+<h1>🎄 Merry Christmas 🎄</h1>
+<p class="subtitle">
+Willkommen bei Jamal's Christmas Slot!
+</p>
+
+<div class="machine">
+
+    <div class="machine-title">
+        🎅 CHRISTMAS JACKPOT 🎅
+    </div>
+
+    <div class="reels">
+        <div class="reel" id="reel1">🎄</div>
+        <div class="reel" id="reel2">🎁</div>
+        <div class="reel" id="reel3">🔔</div>
+    </div>
+
+    <button id="spinButton" onclick="spin()">
+        🎰 JETZT DREHEN!
+    </button>
+
+    <div id="status">
+        Schaffst du den Weihnachts-Jackpot?
+    </div>
+
+</div>
+
+<div id="christmasMessage">
+    <div class="reindeer">🦌🎄</div>
+    <h2>🎅 JACKPOT! 🎅</h2>
+    <p>Frohe Weihnachten</p>
+    <p>wünscht Jamal ❤️</p>
+    <div style="font-size:35px">✨ ❄️ 🎁 ❄️ ✨</div>
+</div>
+
+<button id="musicButton" onclick="toggleMusic()">
+    🔊 Musik einschalten
+</button>
+
+<footer>
+    Made with ❤️ by Jamal
+</footer>
+
+<script>
+
+// --------------------------
+// SLOT MACHINE
+// --------------------------
+
+const symbols = ["🎄", "🎁", "🔔", "⭐", "🍭", "🎅", "🦌"];
+
+const reels = [
+    document.getElementById("reel1"),
+    document.getElementById("reel2"),
+    document.getElementById("reel3")
+];
+
+let spinning = false;
+
+function spin() {
+
+    if (spinning) return;
+
+    spinning = true;
+
+    // Musik starten, sofern sie noch nicht läuft
+    startMusic();
+
+    document.getElementById("christmasMessage").style.display = "none";
+    document.getElementById("status").innerText = "🎰 Die Walzen drehen sich...";
+    document.getElementById("spinButton").disabled = true;
+
+    reels.forEach(reel => {
+        reel.classList.add("spinning");
+    });
+
+    // Zufällige Symbole während des Drehens
+    const intervals = reels.map((reel, index) => {
+
+        return setInterval(() => {
+            reel.innerText = symbols[
+                Math.floor(Math.random() * symbols.length)
+            ];
+        }, 80 + index * 10);
+
+    });
+
+    // Nach exakt 3 Sekunden: alle Walzen stoppen
+    setTimeout(() => {
+
+        intervals.forEach(clearInterval);
+
+        reels.forEach(reel => {
+            reel.classList.remove("spinning");
+            reel.innerText = "🦌";
+        });
+
+        document.getElementById("status").innerText =
+            "🎉 JACKPOT! DU HAST GEWONNEN! 🎉";
+
+        document.getElementById("christmasMessage").style.display = "block";
+
+        document.getElementById("spinButton").disabled = false;
+
+        spinning = false;
+
+    }, 3000);
+}
+
+
+// --------------------------
+// WEIHNACHTSMUSIK
+// --------------------------
+
+// Eine kleine, selbst erzeugte Melodie
+
+let audioContext = null;
+let musicInterval = null;
+let musicEnabled = false;
+let noteIndex = 0;
+
+const melody = [
+    659, 659, 659, 659, 659, 659,
+    659, 784, 523, 587, 659,
+    698, 698, 698, 698, 698,
+    659, 659, 659, 659,
+    587, 587, 659, 587, 784
+];
+
+function playNote(frequency) {
+
+    if (!audioContext || !musicEnabled) return;
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+
+    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+        0.08, audioContext.currentTime + 0.04
+    );
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001, audioContext.currentTime + 0.4
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.45);
+}
+
+function startMusic() {
+
+    if (musicEnabled) return;
+
+    audioContext = audioContext ||
+        new (window.AudioContext || window.webkitAudioContext)();
+
+    audioContext.resume();
+
+    musicEnabled = true;
+
+    document.getElementById("musicButton").innerText =
+        "🔇 Musik ausschalten";
+
+    musicInterval = setInterval(() => {
+
+        playNote(melody[noteIndex]);
+
+        noteIndex = (noteIndex + 1) % melody.length;
+
+    }, 350);
+}
+
+function stopMusic() {
+
+    musicEnabled = false;
+
+    clearInterval(musicInterval);
+
+    document.getElementById("musicButton").innerText =
+        "🔊 Musik einschalten";
+}
+
+function toggleMusic() {
+
+    if (musicEnabled) {
+        stopMusic();
+    } else {
+        startMusic();
+    }
+}
+
+
+// --------------------------
+// FALLENDER SCHNEE
+// --------------------------
+
+const canvas = document.getElementById("snow");
+const ctx = canvas.getContext("2d");
+
+let snowflakes = [];
+
+function resizeCanvas() {
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    snowflakes = Array.from({length: 100}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 3 + 1,
+        speed: Math.random() * 2 + 0.5,
+        drift: Math.random() * 0.8 - 0.4
+    }));
+}
+
+function drawSnow() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.beginPath();
+
+    snowflakes.forEach(flake => {
+
+        ctx.moveTo(flake.x, flake.y);
+
+        ctx.arc(
+            flake.x,
+            flake.y,
+            flake.radius,
+            0,
+            Math.PI * 2
+        );
+
+        flake.y += flake.speed;
+        flake.x += flake.drift;
+
+        if (flake.y > canvas.height) {
+            flake.y = -5;
+            flake.x = Math.random() * canvas.width;
+        }
+
+        if (flake.x > canvas.width) flake.x = 0;
+        if (flake.x < 0) flake.x = canvas.width;
+
+    });
+
+    ctx.fill();
+
+    requestAnimationFrame(drawSnow);
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+resizeCanvas();
+drawSnow();
+
+</script>
+
+</body>
+</html>
